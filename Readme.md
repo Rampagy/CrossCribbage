@@ -11,10 +11,12 @@ The 'x' in xcb stands for 'cross' and 'cb' stands for 'cribbage'.  The format fo
 of line is as such 'TurnNumber:Player:Card:Position'. An example line from an .xcb 
 is shown below:
 
-> 1:1:28:C3
-> 2:0:13:crib
-> 3:0:1:crib
-> 4:0:50:A1
+'''
+1:1:28:C3
+2:0:13:crib
+3:0:1:crib
+4:0:50:A1
+'''
 
 The first line means that on the 1st turn player 1 moved card 28 to position C2.  The 
 second line means on turn 2 player 0 moved card 13 to the crib.  The third line means 
@@ -31,7 +33,16 @@ be trained.
 ## Two User Game
 
 In order to play with two Users rather than one AI and one user, simply replace
-'move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(0))' with 
-'print(board.DecipherCard(card))
-move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))' in 
-'PlayCrossCribbage.py'.
+
+'''
+move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(0))
+'''
+
+with 
+
+'''
+print(board.DecipherCard(card))
+move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
+'''
+
+in PlayCrossCribbage.py.
