@@ -32,9 +32,11 @@ while not (board.IsGameOver()):
             move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(0))
         else:
             # only print the card if it is the user's board
+            #move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
             print(board.DecipherCard(card))
             move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
 
+        print(move)
         valid_input = board.AddMoveToBoard(move)
 
 
