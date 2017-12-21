@@ -1,7 +1,7 @@
 import numpy as np
 import ComputeScore as cs
 
-def AIBot(board_state, card, cards_in_crib):
+def AIBot(board_state, card, cards_in_crib, player):
     potential_grid = np.matrix([[-100, -100, -100, -100, -100],
                                 [-100, -100, -100, -100, -100],
                                 [-100, -100, -100, -100, -100],
@@ -28,23 +28,25 @@ def AIBot(board_state, card, cards_in_crib):
                         temp_board_state[i, j] = board_state[i, j]
                         
                 temp_board_state[row, column] = card
-
-                print(temp_board_state)
                 
                 potential = (cs.ScoreRow(temp_board_state, row) - cs.ScoreRow(board_state, row)) - \
                             (cs.ScoreRow(temp_board_state.T, column) - cs.ScoreRow(board_state.T, column))
 
                 potential_grid[row, column] = potential
-
-                print('(' + str(cs.ScoreRow(temp_board_state, row)) + ' - ' +  str(cs.ScoreRow(board_state, row)) + ')' + ' - ' + \
-                      '(' + str(cs.ScoreRow(temp_board_state.T, column)) + ' - ' + str(cs.ScoreRow(board_state.T, column)) + ')')
-                
+             
                 if (potential > max_potential):
                     best_row = row
                     best_col = column
                     max_potential = potential
 
     print(potential_grid)
+
+    # if we are player 1 going up and down swap the x and y coordinates
+    if (player == 1):
+        temp = best_row
+        best_row = best_col
+        best_col = temp
+
     
     if (max_potential > -1):
         return chr(best_row+65) + chr(best_col+49)
