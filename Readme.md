@@ -1,48 +1,60 @@
 # Cross Cribbage ASCII game
 
 This game was created to provide a base for a machine learning bot to train off of.  
-It produces a .xcb file which has a record of the moves made during the game.  The 
+It produces a .csv file which has a record of the moves made during the game.  The 
 rules for the game can be [found here.](http://www.outsetmedia.com/sites/default/files/Instructions%20-%20CrossCribb.pdf)  
 This game will only consist of 2 player variation.
 
 ## Save format
 
-The x in .xcb stands for cross and cb stands for cribbage.  The format for each
-of line is as such TurnNumber:Player:Card:Position. An example line from an .xcb 
-is shown below:
+The format the games are saved is "turn_game_state,card_being_placed,does_winner_have_crib,turn_resulting_game_state".  The 
+game states are saved as a comma seperated flattened game matrix.  The matrix is flattened in a left to right then top to 
+bottom fashion.  See example below.
+
+This game state:
 
 ```
-1:1:28:C3
-2:0:13:crib
-3:0:1:crib
-4:0:50:A1
+0,0,0,0,0
+0,0,0,0,0
+0,0,17,0,0
+0,0,0,0,0
+0,0,0,0,0
 ```
 
-The first line means that on the 1st turn player 1 moved card 28 to position C2.  The 
-second line means on turn 2 player 0 moved card 13 to the crib.  The third line means 
-on turn 3 player 0 moved card 1 to the crib.  The last line means on turn 4 player 0 
-moved card 50 to A1.
+would be flattened to:
+
+```
+0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,0,0,0,0,0
+```
+
+The pre-turn game state is labeled with headers in1,in2,in3,etc.... with the last in being the crib.  The post-
+turn game state is labeled in the same way except with "out" rather than "in".
+
+The cards are encoded into a decimal from their original hierarchy+value.  The mapping from hierarchy+value to decimal 
+can be found in the init function of the "CribbageBoard" class.
 
 ## Artificial Intelligence
 
-Currently the AI simply goes from left to right then top to bottom unless his crib is 
-not filled.  In the future this may change.  This Ai was made simply so that you could 
-have someone to play against and record .xcb files for a Convolution Neural Network to
-be trained.
+The AI currently simply goes creates a point differential grid for each position the card can be placed and then simply
+places it at the highest differential point.
 
 ## Two User Game
 
-In order to play with two Users rather than one AI and one user, simply replace
+In order to play with a User vs AI rather than AI vs AI, simply replace comment line 39 and uncomment line 40 and 41
+in CrossCribbage.py as shown below.
+
+AI vs AI
 
 ```python
-move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(0))
+move = aib.AIBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1)
+#print(board.DecipherCard(card))
+#move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
 ```
 
-with 
+AI vs User
 
 ```python
+#move = aib.AIBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1)
 print(board.DecipherCard(card))
-move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(0))
+move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
 ```
-
-in PlayCrossCribbage.py.
