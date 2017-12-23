@@ -65,7 +65,7 @@ class CribbageBoard:
                             51:' Q\u2666',
                             52:' K\u2666'
                             }
-        
+
         self.cribbage_board = np.matrix([[0, 0, 0, 0, 0],
                                          [0, 0, 0, 0, 0],
                                          [0, 0, 0, 0, 0],
@@ -80,15 +80,15 @@ class CribbageBoard:
         self.players_turn = 1
         self.player0_cards_in_crib = 0
         self.crib_owner = crib_owner_in
-        
+
         self.game_history = []
 
     def DisplayGame(self):
         print('   1  2  3  4  5\n', end='')
-        
+
         count = 0
         letter_inc = 65
-    
+
         for row_idx in range(0, len(self.cribbage_board)):
             for col_idx in range(0, len(self.cribbage_board)):
                 if (count%5 == 0):
@@ -100,7 +100,7 @@ class CribbageBoard:
 
                 if (count >= 4):
                     print('\n')
-            
+
                 count += 1
 
 
@@ -110,7 +110,7 @@ class CribbageBoard:
         for val in crib_disp:
             print(self.playing_cards[val], end=' ')
 
-    
+
     def PickCardFromDeck(self):
         self.picked_card = self.card_deck[0]
         self.card_deck = self.card_deck[1:len(self.card_deck)]
@@ -127,10 +127,10 @@ class CribbageBoard:
                         return False
 
         return True
-    
+
     def AddMoveToBoard(self, move):
         valid_move_found = False
-        
+
         if (self.GetCardsInCrib(self.players_turn) >= 2):
             for i in range(0, len(self.cribbage_board)):
                 for j in range(0, len(self.cribbage_board)):
@@ -147,12 +147,12 @@ class CribbageBoard:
             self.players_turn ^= 1
             return True
 
-        
+
         if move.upper() == 'CRIB':
             if ((self.crib.size < 4) and
                 (((self.players_turn == 0) and (self.player0_cards_in_crib <= 1)) or
                 ((self.players_turn != 0) and (self.crib.size-self.player0_cards_in_crib <= 1)))):
-                
+
                 self.crib = np.append(self.crib, np.array([self.picked_card]))
                 if (self.players_turn == 0):
                     self.player0_cards_in_crib += 1
@@ -163,7 +163,7 @@ class CribbageBoard:
 
         if (len(move) != 2):
             return False
-            
+
         row = ord(move[0].upper())-65
         column = ord(move[1])-49
 
@@ -176,7 +176,7 @@ class CribbageBoard:
             return True
         else:
             return False
-            
+
 
     def DecipherCard(self, card):
         return self.playing_cards[card]
@@ -189,14 +189,25 @@ class CribbageBoard:
     def RecordMove(self, player, game_state, card, move):
         card = str(card)
         player = str(player)
-        rec_game_state = ','.join(str(i) for i in np.squeeze(np.asarray(self.cribbage_board.flatten())).tolist())
-        
+        game_state_transpose = np.zeros((5,5))
+
+        if player == '1':
+            game_state_transpose = np.squeeze(np.asarray(game_state.transpose().flatten())).tolist()
+        else:
+            game_state_transpose = np.squeeze(np.asarray(game_state.flatten())).tolist()
+
+        rec_game_state = ','.join(str(i) for i in game_state_transpose)
+
         rec_move = ''
         if (move != 'CRIB'):
-            rec_move = str(5*(ord(move[0])-65) + ord(move[1])-49)
+            if player == '0':
+                rec_move = str(5*(ord(move[0])-65) + (ord(move[1])-49))
+            # if player 1 normalize the move the the horizontal direction
+            else:
+                rec_move = str((ord(move[0])-65) + 5*(ord(move[1])-49))
         else:
             rec_move = '25'
-        
+
         recorded_move = player + ":" + rec_game_state + ":" + card + ":" + rec_move
         self.game_history.append(recorded_move)
 
@@ -204,42 +215,37 @@ class CribbageBoard:
     def SaveGameHistory(self, player0_score, player1_score):
         file_path = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(file_path, 'Replays')
-        
+
         if not os.path.exists(file_path):
             os.makedirs(file_path)
-        
+
         file_path = os.path.join(file_path, 'replay')
         opt = ''
         if os.path.exists(file_path + '.csv'):
             opt = 'a'
         else:
             opt = 'w'
-        
+
         save_file = open(file_path + '.csv', opt)
         #if new file write a header at the top
         if (opt == 'w'):
-            save_file.write('in0,in1,in2,in3,in4,in5,in6,in7,in8,in9,in10,in11,in12,in13,in14,in15,in16,in17,in18,in19,in20,in21,in22,in23,in24,CardToBePlaced,WinningPlayersCrib,' + \
-                            'out0,out1,out2,out3,out4,out5,out6,out7,out8,out9,out10,out11,out12,out13,out14,out15,out16,out17,out18,out19,out20,out21,out22,out23,out24,PlaceInCrib\n')
+            save_file.write('in0,in1,in2,in3,in4,in5,in6,in7,in8,in9,in10,in11,in12,in13,in14,in15,in16,in17,in18,in19,in20,in21,in22,in23,in24,CardToBePlaced,WinningPlayersCrib,truthPosition\n')
 
         for turn in self.game_history:
             player, game_state, card, move = turn.split(':')
-            
+
             #produce the truth game state to generate an error in the neural network
-            correct_game_state = np.zeros(26)
             if move == 'CRIB':
-                correct_game_state[25] = 1
-            else:
-                correct_game_state[int(move)] = 1
-                
-            rec_correct_game_state = ','.join(str(int(i)) for i in correct_game_state.tolist())
-            
+                move = '25'
+
             # only write the winning players moves
             if((player0_score > player1_score) and (player == '0')):
-                save_file.write("{0},{1},{2},{3}\n".format(game_state, card, str(int(self.crib_owner==0)), rec_correct_game_state))
+                save_file.write("{0},{1},{2},{3}\n".format(game_state, card, str(int(self.crib_owner==0)), move))
 
-            if((player1_score > player0_score) and (player == '1')):
-                save_file.write("{0},{1},{2},{3}\n".format(game_state, card, str(int(self.crib_owner==1)), rec_correct_game_state))
-                
+            # tie goes to player 1
+            if((player1_score >= player0_score) and (player == '1')):
+                save_file.write("{0},{1},{2},{3}\n".format(game_state, card, str(int(self.crib_owner==1)), move))
+
 
     def GetCardsInCrib(self, player):
         if (player == 0):
@@ -260,27 +266,3 @@ class CribbageBoard:
 
     def GetCribOwner(self):
         return self.crib_owner
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

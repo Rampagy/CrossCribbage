@@ -13,11 +13,11 @@ def AIBot(board_state, card, cards_in_crib, player):
                                   [-100, -100, -100, -100, -100],
                                   [-100, -100, -100, -100, -100],
                                   [-100, -100, -100, -100, -100]])
-    
+
     max_potential = -100
     best_row = 0
     best_col = 0
-    
+
     for row in range(0, len(potential_grid)):
         for column in range(0, len(potential_grid)):
             if (board_state[row, column] == 0):
@@ -26,36 +26,37 @@ def AIBot(board_state, card, cards_in_crib, player):
                     for j in range(0, len(board_state)):
                         # reset the board state
                         temp_board_state[i, j] = board_state[i, j]
-                        
+
                 temp_board_state[row, column] = card
-                
+
                 potential = (cs.ScoreRow(temp_board_state, row) - cs.ScoreRow(board_state, row)) - \
                             (cs.ScoreRow(temp_board_state.T, column) - cs.ScoreRow(board_state.T, column))
 
                 potential_grid[row, column] = potential
-             
+
                 if (potential > max_potential):
                     best_row = row
                     best_col = column
                     max_potential = potential
 
-    #print(potential_grid)
+    print(potential_grid)
 
-    # if we are player 1 going up and down swap the x and y coordinates
+    # if we are player 1 (going up and down) swap the x and y coordinates
     if (player == 1):
         temp = best_row
         best_row = best_col
         best_col = temp
 
-    
+
+
     if (max_potential > -1):
         return chr(best_row+65) + chr(best_col+49)
     elif (cards_in_crib < 2):
         return 'crib'
     else:
         return chr(best_row+65) + chr(best_col+49)
-    
-    
+
+
 
 """
     if (cards_in_crib < 2):
@@ -66,7 +67,7 @@ def AIBot(board_state, card, cards_in_crib, player):
                 if (board_state[i, j] == 0):
                     move = chr(i+65) + chr(j+49)
                     return move
-    
+
     return 'no possible move'
 """
 
