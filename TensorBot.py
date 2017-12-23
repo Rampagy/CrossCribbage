@@ -5,6 +5,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 import ParseData as pd
+import os
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -85,9 +86,8 @@ def main(unused_argv):
   eval_data = np.asarray(data[train_length:, :27])
   eval_labels = np.asarray(data[train_length:, 27:]).flatten()
 
-
   # Create the Estimator
-  cribbage_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="/home/alex/models/xc_fullyconnected_model")
+  cribbage_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), "xc_fullyconnected_model"))
 
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
