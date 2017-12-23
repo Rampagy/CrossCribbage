@@ -9,15 +9,15 @@ def PlayGame(GraphicsOn=True):
     board = bg.CribbageBoard(np.random.randint(0, 2))
     card = board.PickCardFromDeck()
     turn_count = 0
-    
+
     # put the initial card in the middle of the board
     board.AddMoveToBoard('C3')
-    
+
     # a 'game' has 25 turns - 1 for the initial middle card
     while not (board.IsGameOver()):
         turn_count += 1
         if GraphicsOn:
-            print('\n'*50)
+            print('\n'*20)
             print('\nType "Crib" to put the card in the Crib\n')
             print('Players Turn: ' + str(board.GetPlayersTurn()))
             print('Player ' + str(board.crib_owner) + "'s crib.\n")
@@ -26,9 +26,9 @@ def PlayGame(GraphicsOn=True):
             print('')
             print('Player 0 ->->->->->->\n')
             board.DisplayGame()
-            
+
         card = board.PickCardFromDeck()
-    
+
         valid_input = False
         while (not valid_input):
             if (board.GetPlayersTurn() == 0):
@@ -42,18 +42,18 @@ def PlayGame(GraphicsOn=True):
 
             if GraphicsOn:
                 print(move)
-                
+
             valid_input = board.AddMoveToBoard(move)
-    
+
     scores = cs.ScoreGame(board.GetBoardState())
     crib_score = cs.ScoreCrib(board.GetCribRow())
     player0_score, player1_score = scores[0], scores[1]
-    
+
     if (board.GetCribOwner() == 0):
         player0_score += crib_score
     else:
         player1_score += crib_score
-    
+
     board.SaveGameHistory(player0_score, player1_score)
 
     if GraphicsOn:
@@ -63,14 +63,3 @@ def PlayGame(GraphicsOn=True):
         print('Player 0 Score: ' + str(player0_score))
         print('Player 1 Score: ' + str(player1_score))
         print('Crib Score: ' + str(crib_score))
-
-
-
-
-
-
-
-
-
-
-

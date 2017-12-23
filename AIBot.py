@@ -39,7 +39,7 @@ def AIBot(board_state, card, cards_in_crib, player):
                     best_col = column
                     max_potential = potential
 
-    print(potential_grid)
+    #print(potential_grid)
 
     # if we are player 1 (going up and down) swap the x and y coordinates
     if (player == 1):

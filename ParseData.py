@@ -4,8 +4,8 @@ import os
 
 def GetTrainingData():
     data_list = []
-    
-    with open(os.path.dirname(os.path.abspath(__file__)) + '\Replays\\replay.csv', 'rt') as fi:
+
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Replays', 'replay.csv'), 'rt') as fi:
         reader = csv.reader(fi)
         for row in reader:
             #skip the header
@@ -15,11 +15,12 @@ def GetTrainingData():
     return np.matrix(data_list)
 
 """
-data = GetTrainingData()
-input_data = data[:, :27]
-output_data = data[:, 28:]
+data = GetTrainingData().T
+input_data = data[:27, :]
+output_data = data[27:, :]
 
-print(data[0])
-print(input_data[0])
-print(output_data[0])
+print(data.shape)
+print(data[:, 0])
+print(input_data[:, 0])
+print(output_data[:, 0])
 """

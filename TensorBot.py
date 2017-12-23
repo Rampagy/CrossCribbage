@@ -14,7 +14,7 @@ def cnn_model_fn(features, labels, mode):
   # Reshape X to 4-D tensor: [batch_size, width, height, channels]
   # Cribbage board is 5x5 pixels, and have one 'color channel'
   # The input is a flattened cribbage board
-  input_layer = tf.reshape(features["x"], [-1, 27, 1, 1])
+  input_layer = tf.reshape(features["x"], [-1, 27])
 
   # Dense Layer #1
   # Densely connected layer with 1024 neurons
@@ -33,7 +33,7 @@ def cnn_model_fn(features, labels, mode):
 
   # Add dropout operation; 0.6 probability that element will be kept
   dropout2 = tf.layers.dropout(inputs=dense2, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-      
+
   # Logits layer
   # Input Tensor Shape: [batch_size, 512]
   # Output Tensor Shape: [batch_size, 26]
@@ -51,8 +51,6 @@ def cnn_model_fn(features, labels, mode):
 
   # Calculate Loss (for both TRAIN and EVAL modes)
   onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=26)
-  print(onehot_labels)
-  print(logits)
   loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=logits)
 
   # Configure the Training Op (for TRAIN mode)
@@ -71,19 +69,25 @@ def main(unused_argv):
   # Load training and eval data
   mnist = tf.contrib.learn.datasets.load_dataset("mnist")
   train_data = mnist.train.images  # Returns np.array
-  
+
   train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
   eval_data = mnist.test.images  # Returns np.array
   eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
   """
 
-  # read in the training data 
+  # read in the training data
   data = pd.GetTrainingData() # Returns a np.matrix
-  train_data = data[:, :27]
-  train_labels = data[:, 27:]
-  
+  train_length = int(data.shape[0]*0.85)
+
+  train_data = np.asarray(data[:train_length, :27])
+  train_labels = np.asarray(data[:train_length, 27:]).flatten()
+
+  eval_data = np.asarray(data[train_length:, :27])
+  eval_labels = np.asarray(data[train_length:, 27:]).flatten()
+
+
   # Create the Estimator
-  cribbage_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="/tmp/mnist_convnet_model")
+  cribbage_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="/home/alex/models/xc_fullyconnected_model")
 
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -98,7 +102,7 @@ def main(unused_argv):
     num_epochs=None,
     shuffle=True)
   cribbage_classifier.train(input_fn=train_input_fn,
-    steps=20000,
+    steps=40000,
     hooks=[logging_hook])
 
   # Evaluate the model and print results
@@ -107,7 +111,7 @@ def main(unused_argv):
     y=eval_labels,
     num_epochs=1,
     shuffle=False)
-    
+
   eval_results = cribbage_classifier.evaluate(input_fn=eval_input_fn)
   print(eval_results)
 
