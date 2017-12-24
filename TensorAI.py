@@ -19,23 +19,71 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner):
     temp_board_state = np.asarray(board_state).flatten().tolist()
     temp_board_state += [card]
     temp_board_state += [int(player == crib_owner)]
-    temp_board_state = list(map(float, temp_board_state))
+    temp_board_state = np.asarray(list(map(float, temp_board_state)))
 
     # Create the Estimator
     cribbage_classifier = tf.estimator.Estimator(model_fn=tb.cnn_model_fn, model_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), "xc_fullyconnected_model"))
 
     # Set up logging for predictions
     # Log the values in the "Softmax" tensor with label "probabilities"
-    #tensors_to_log = {"probabilities": "softmax_tensor"}
-    #logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
+    # tensors_to_log = {"probabilities": "softmax_tensor"}
+    # logging_hook = tf.predict.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
 
     # Evaluate the model and print results
     pred_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": temp_board_state},
-      y=0,
       num_epochs=1,
       shuffle=False)
 
     eval_results = cribbage_classifier.predict(input_fn=pred_input_fn)
-    print(eval_results)
-    take(26, eval_results)
+    position_probabilities = next(eval_results)['probabilities']
+
+    temp_board = np.asarray(board_state).flatten()
+
+    max_prob = 0.0
+    best_pos = 0
+
+    for i in range(0, len(position_probabilities)):
+        # if the best position is the crib
+        if ((position_probabilities[i] > max_prob) and (i==25)):
+            # and the crib has open spots
+            if (cards_in_crib < 2):
+                max_prob = position_probabilities[i]
+                best_pos = i
+            else:
+                continue
+        # if the best position doesn't already have a card there
+        elif (position_probabilities[i] > max_prob) and (temp_board[i] == 0):
+            max_prob = position_probabilities[i]
+            best_pos = i
+
+    move = ''
+    if (best_pos == 25):
+        move = 'CRIB'
+    elif (player==1):
+        move = chr(int(best_pos%5)+65) + chr(int(best_pos/5)+49)
+    else: # player 0
+        move = chr(int(best_pos/5)+65) + chr(int(best_pos%5)+49)
+
+    print(move)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def a():
+    pass

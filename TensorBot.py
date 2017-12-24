@@ -17,7 +17,7 @@ def cnn_model_fn(features, labels, mode):
   # The input is a flattened cribbage board
 
   input_layer = tf.reshape(features["x"], [-1, 27])
-
+  #print(input_layer)
   # Dense Layer #1
   # Densely connected layer with 1024 neurons
   # Input Tensor Shape: [batch_size, 1 * 1 * 27] (27 features that are 1x1)
