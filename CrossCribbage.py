@@ -56,7 +56,8 @@ def PlayGame(GraphicsOn=True, WriteToFile=True):
     else:
         player1_score += crib_score
 
-    board.SaveGameHistory(player0_score, player1_score)
+    if WriteToFile:
+        board.SaveGameHistory(player0_score, player1_score)
 
     if GraphicsOn:
         print('\n\nCrib:')

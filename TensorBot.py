@@ -25,21 +25,30 @@ def cnn_model_fn(features, labels, mode):
   dense1 = tf.layers.dense(inputs=input_layer, units=1024, activation=tf.nn.relu)
 
   # Add dropout operation; 0.6 probability that element will be kept
-  dropout1 = tf.layers.dropout(inputs=dense1, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+  dropout1 = tf.layers.dropout(inputs=dense1, rate=0.5, training=mode == tf.estimator.ModeKeys.TRAIN)
 
   # Dense Layer #2
   # Densely connected layer with 512 neurons
   # Input Tensor Shape: [batch_size, 1024]
   # Output Tensor Shape: [batch_size, 512]
-  dense2 = tf.layers.dense(inputs=dropout1, units=512, activation=tf.nn.relu)
+  dense2 = tf.layers.dense(inputs=dropout1, units=1024, activation=tf.nn.relu)
 
   # Add dropout operation; 0.6 probability that element will be kept
-  dropout2 = tf.layers.dropout(inputs=dense2, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+  dropout2 = tf.layers.dropout(inputs=dense2, rate=0.5, training=mode == tf.estimator.ModeKeys.TRAIN)
+
+  # Dense Layer #3
+  # Densely connected layer with 1024 neurons
+  # Input Tensor Shape: [batch_size, 1024]
+  # Output Tensor Shape: [batch_size, 1024]
+  dense3 = tf.layers.dense(inputs=dropout2, units=1024, activation=tf.nn.relu)
+
+  # Add dropout operation; 0.6 probability that element will be kept
+  dropout3 = tf.layers.dropout(inputs=dense3, rate=0.5, training=mode == tf.estimator.ModeKeys.TRAIN)
 
   # Logits layer
   # Input Tensor Shape: [batch_size, 512]
   # Output Tensor Shape: [batch_size, 26]
-  logits = tf.layers.dense(inputs=dropout2, units=26)
+  logits = tf.layers.dense(inputs=dropout3, units=26)
 
   predictions = {
       # Generate predictions (for PREDICT and EVAL mode)
