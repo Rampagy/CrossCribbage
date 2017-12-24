@@ -15,6 +15,7 @@ def cnn_model_fn(features, labels, mode):
   # Reshape X to 4-D tensor: [batch_size, width, height, channels]
   # Cribbage board is 5x5 pixels, and have one 'color channel'
   # The input is a flattened cribbage board
+
   input_layer = tf.reshape(features["x"], [-1, 27])
 
   # Dense Layer #1

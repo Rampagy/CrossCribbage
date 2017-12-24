@@ -3,8 +3,9 @@ import ComputeScore as cs
 import UserBot as ub
 import AIBot as aib
 import numpy as np
+import TensorAI as tai
 
-def PlayGame(GraphicsOn=True):
+def PlayGame(GraphicsOn=True, WriteToFile=True):
     # initialize the game
     board = bg.CribbageBoard(np.random.randint(0, 2))
     card = board.PickCardFromDeck()
@@ -36,9 +37,10 @@ def PlayGame(GraphicsOn=True):
                 move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(0), 0)
             else:
                 # only print the card if it is the user's board
-                move = aib.AIBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1)
-                #print(board.DecipherCard(card))
-                #move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
+                tai.TensorAI(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1, int(board.crib_owner==1))
+
+                print(board.DecipherCard(card))
+                move = ub.UserBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1))
 
             if GraphicsOn:
                 print(move)
