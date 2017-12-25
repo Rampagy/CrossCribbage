@@ -10,7 +10,7 @@ def GetTrainingData():
         for row in reader:
             #skip the header
             if row[0] != 'in0':
-                data_list.append(list(map(float, row)))
+                data_list.append(list(np.float32(row)))
 
     return np.matrix(data_list)
 

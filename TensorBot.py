@@ -16,39 +16,56 @@ def cnn_model_fn(features, labels, mode):
   # Cribbage board is 5x5 pixels, and have one 'color channel'
   # The input is a flattened cribbage board
 
-  input_layer = tf.reshape(features["x"], [-1, 27])
-  #print(input_layer)
+  input_layer = tf.reshape(features["x"], [-1, 27, 1, 1])
+
+  # Convolutional Layer #1
+  # Computes 32 features using a 5x5 filter with ReLU activation.
+  # Padding is added to preserve width and height.
+  # Input Tensor Shape: [batch_size, 27, 1, 1]
+  # Output Tensor Shape: [batch_size, 27, 1, 32]
+  conv1 = tf.layers.conv2d(
+      inputs=input_layer,
+      filters=32,
+      kernel_size=[5, 1],
+      padding="same",
+      activation=tf.nn.relu)
+
+  # Pooling Layer #1
+  # First max pooling layer with a 2x1 filter and stride of 2
+  # Input Tensor Shape: [batch_size, 27, 1, 32]
+  # Output Tensor Shape: [batch_size, 9, 1, 32]
+  pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[3, 1], strides=3)
+
+  # Convolutional Layer #2
+  # Computes 32 features using a 1x2 filter.
+  # Padding is added to preserve width and height.
+  # Input Tensor Shape: [batch_size, 9, 1, 32]
+  # Output Tensor Shape: [batch_size, 9, 1, 64]
+  conv2 = tf.layers.conv2d(
+      inputs=pool1,
+      filters=64,
+      kernel_size=[1, 5],
+      padding="same",
+      activation=tf.nn.relu)
+
+  # Flatten tensor into a batch of vectors
+  # Input Tensor Shape: [batch_size, 9, 1, 64]
+  # Output Tensor Shape: [batch_size, 9 * 1 * 64]
+  pool2_flat = tf.reshape(conv2, [-1, 9 * 1 * 64])
+
   # Dense Layer #1
   # Densely connected layer with 1024 neurons
-  # Input Tensor Shape: [batch_size, 1 * 1 * 27] (27 features that are 1x1)
+  # Input Tensor Shape: [batch_size, 13 * 1 * 32]
   # Output Tensor Shape: [batch_size, 1024]
-  dense1 = tf.layers.dense(inputs=input_layer, units=1024, activation=tf.nn.relu)
+  dense1 = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
 
   # Add dropout operation; 0.6 probability that element will be kept
   dropout1 = tf.layers.dropout(inputs=dense1, rate=0.5, training=mode == tf.estimator.ModeKeys.TRAIN)
 
-  # Dense Layer #2
-  # Densely connected layer with 512 neurons
-  # Input Tensor Shape: [batch_size, 1024]
-  # Output Tensor Shape: [batch_size, 512]
-  dense2 = tf.layers.dense(inputs=dropout1, units=1024, activation=tf.nn.relu)
-
-  # Add dropout operation; 0.6 probability that element will be kept
-  dropout2 = tf.layers.dropout(inputs=dense2, rate=0.5, training=mode == tf.estimator.ModeKeys.TRAIN)
-
-  # Dense Layer #3
-  # Densely connected layer with 1024 neurons
-  # Input Tensor Shape: [batch_size, 1024]
-  # Output Tensor Shape: [batch_size, 1024]
-  dense3 = tf.layers.dense(inputs=dropout2, units=1024, activation=tf.nn.relu)
-
-  # Add dropout operation; 0.6 probability that element will be kept
-  dropout3 = tf.layers.dropout(inputs=dense3, rate=0.5, training=mode == tf.estimator.ModeKeys.TRAIN)
-
   # Logits layer
   # Input Tensor Shape: [batch_size, 512]
   # Output Tensor Shape: [batch_size, 26]
-  logits = tf.layers.dense(inputs=dropout3, units=26)
+  logits = tf.layers.dense(inputs=dropout1, units=26)
 
   predictions = {
       # Generate predictions (for PREDICT and EVAL mode)

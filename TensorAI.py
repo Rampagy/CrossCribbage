@@ -19,7 +19,7 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner):
     temp_board_state = np.asarray(board_state).flatten().tolist()
     temp_board_state += [card]
     temp_board_state += [int(player == crib_owner)]
-    temp_board_state = np.asarray(list(map(float, temp_board_state)))
+    temp_board_state = np.float32(np.asarray(list(map(float, temp_board_state))))
 
     # Create the Estimator
     cribbage_classifier = tf.estimator.Estimator(model_fn=tb.cnn_model_fn, model_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), "xc_fullyconnected_model"))
