@@ -36,11 +36,13 @@ def PlayGame(GraphicsOn=True, WriteToFile=True):
                 # call AI bot
                 move = aib.AIBot(board.GetBoardState(), card, board.GetCardsInCrib(0), 0)
             else:
+                # call AI bot
+                move = aib.AIBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1)
                 # only print the card if it is the user's board
-                tai.TensorAI(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1, int(board.crib_owner==1))
+                #tai.TensorAI(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1, int(board.crib_owner==1))
 
-                print(board.DecipherCard(card))
-                move = ub.UserBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1))
+                #print(board.DecipherCard(card))
+                #move = ub.UserBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1))
 
             if GraphicsOn:
                 print(move)

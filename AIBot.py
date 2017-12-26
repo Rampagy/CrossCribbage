@@ -18,8 +18,8 @@ def AIBot(board_state, card, cards_in_crib, player):
     best_row = 0
     best_col = 0
 
-    for row in range(0, len(potential_grid)):
-        for column in range(0, len(potential_grid)):
+    for column in range(0, len(potential_grid)):
+        for row in range(0, len(potential_grid)):
             if (board_state[row, column] == 0):
 
                 for i in range(0, len(board_state)):
