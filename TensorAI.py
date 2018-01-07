@@ -4,17 +4,6 @@ import tensorflow as tf
 import os
 
 def TensorAI(board_state, card, cards_in_crib, player, crib_owner):
-    model_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cx_fullyconnected_model', 'model.ckpt')
-
-    # build your model (same as training)
-    """
-    sess = tf.Session()
-    saver = tf.train.Saver()
-    saver.restore(sess, model_path)
-
-    print(temp_board_state)
-    print(type(temp_board_state[0]))
-    """
 
     temp_board_state = np.asarray(board_state).flatten().tolist()
     temp_board_state += [card]
