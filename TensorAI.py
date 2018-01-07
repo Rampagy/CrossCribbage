@@ -24,11 +24,6 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner):
     # Create the Estimator
     cribbage_classifier = tf.estimator.Estimator(model_fn=tb.cnn_model_fn, model_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), "xc_fullyconnected_model"))
 
-    # Set up logging for predictions
-    # Log the values in the "Softmax" tensor with label "probabilities"
-    # tensors_to_log = {"probabilities": "softmax_tensor"}
-    # logging_hook = tf.predict.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
-
     # Evaluate the model and print results
     pred_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": temp_board_state},
