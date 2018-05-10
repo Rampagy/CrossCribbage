@@ -5,7 +5,7 @@ def subset_sum(numbers, target, partial=[]):
     s = sum(partial)
 
     # check if the partial sum is equals to target
-    if s == target: 
+    if s == target:
         global count_15s
         count_15s += 1
     if s >= target:
@@ -14,7 +14,7 @@ def subset_sum(numbers, target, partial=[]):
     for i in range(len(numbers)):
         n = numbers[i]
         remaining = numbers[i+1:]
-        subset_sum(remaining, target, partial + [n]) 
+        subset_sum(remaining, target, partial + [n])
 
 
 def ConvertToHeirarchy(row):
@@ -25,7 +25,7 @@ def ConvertToHeirarchy(row):
         if (row[i] != 0):
             val = (row[i]-1)%13 + 1
         new_row += [val]
-        
+
     return new_row
 
 
@@ -39,7 +39,7 @@ def ConvertToValue(row):
         elif val > 10:
             val = 10
         new_row += [val]
-        
+
     return new_row
 
 
@@ -50,7 +50,7 @@ def ConvertMatToRow(matrix, row_idx):
 def HistogramRow(row):
     histogram = {}
     row = sorted(row)
-    
+
     for i in range(0, len(row)):
         if not row[i] in histogram:
             histogram[row[i]] = 1
@@ -63,7 +63,7 @@ def HistogramRow(row):
 def Score15s(row):
     row = ConvertToValue(row)
     new_row = []
-    
+
     # strip out the zeros
     for i in range(0, len(row)):
         if (row[i] != 0):
@@ -78,7 +78,7 @@ def Score15s(row):
 def ScoreRuns(row):
     row = ConvertToHeirarchy(row)
     histogram = HistogramRow(row)
-    
+
     prev_key = -1
     run_keys = []
     max_histo_val = 0
@@ -93,14 +93,14 @@ def ScoreRuns(row):
             run_len = 1
             if (len(run_keys) < 3):
                 run_keys = []
-            
+
         prev_key = key
 
     if (len(run_keys) >= 3):
         for key in run_keys:
             if (histogram[key] > max_histo_val):
                 max_histo_val = histogram[key]
-        
+
     return max_histo_val * len(run_keys)
 
 
@@ -108,12 +108,12 @@ def ScorePairs(row):
     row = ConvertToHeirarchy(row)
     histogram = HistogramRow(row)
     pair_score = 0
-    
+
     for key, val in histogram.items():
         if ((val > 1) and (key != 0)):
             # val choose 2 (count the number of pairs)
             pair_score += math.factorial(val) / (math.factorial(2) * math.factorial(val-2))
-            
+
     return int(pair_score)*2
 
 
@@ -123,7 +123,7 @@ def ScoreFlush(row):
     heart_count = 0
     club_count = 0
     unplaced_count = 0
-    
+
     for i in range(0, len(row)):
         if ((row[i] <= 13) and (row[i] >= 1)):
             spade_count += 1
@@ -158,14 +158,14 @@ def ScoreCrib(crib):
 def ScoreGame(matrix):
     player0_score = 0
     player1_score = 0
-    
+
     for i in range(0, len(matrix)):
         player0_score += ScoreRow(matrix, i)
         player1_score += ScoreRow(matrix.T, i)
 
     return (player0_score, player1_score)
 
-        
+
 
 """
 cribbage_board = np.matrix([[5, 5, 5, 5, 5],
@@ -194,7 +194,7 @@ print("player 1 score " + str(a))
 print("player 2 score " + str(b))
 """
 
-    
+
 
 """
 cribbage_board = np.matrix([[8, 8, 7, 7, 7],

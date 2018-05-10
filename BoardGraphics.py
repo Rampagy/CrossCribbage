@@ -129,8 +129,11 @@ class CribbageBoard:
         return True
 
     def AddMoveToBoard(self, move):
+        # return if move was accepted/added
+
         valid_move_found = False
 
+        # determine if there is a move that can be made
         if (self.GetCardsInCrib(self.players_turn) >= 2):
             for i in range(0, len(self.cribbage_board)):
                 for j in range(0, len(self.cribbage_board)):
@@ -142,12 +145,12 @@ class CribbageBoard:
         else:
             valid_move_found = True
 
-
+        # no valid moves
         if (valid_move_found == False):
             self.players_turn ^= 1
             return True
 
-
+        # check if the move is to the crib
         if move.upper() == 'CRIB':
             if ((self.crib.size < 4) and
                 (((self.players_turn == 0) and (self.player0_cards_in_crib <= 1)) or
@@ -161,12 +164,16 @@ class CribbageBoard:
             else:
                 return False
 
+        # if the len of the move is not to the crib and longer than 2 char
+        # it is an invalid move
         if (len(move) != 2):
             return False
 
+        # convert to row and col indices
         row = ord(move[0].upper())-65
         column = ord(move[1])-49
 
+        # if in dimensions of the board and spot is empty
         if ((column <= 4) and (column >= 0) and (row <= 4) and (row >= 0) and
             (self.cribbage_board[row, column] == 0)):
 

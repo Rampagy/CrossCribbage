@@ -1,73 +1,43 @@
 import numpy as np
-import TensorBot as tb
-import tensorflow as tf
+import tflearn
 import os
 
-def TensorAI(board_state, card, cards_in_crib, player, crib_owner):
+def TensorAI(board_state, card, cards_in_crib, player, crib_owner, predict_model):
 
-    temp_board_state = np.asarray(board_state).flatten().tolist()
-    temp_board_state += [card]
-    temp_board_state += [int(player == crib_owner)]
-    temp_board_state = np.float32(np.asarray(list(map(float, temp_board_state))))
+    # create tf graph inputs
+    observations = np.asarray(board_state).flatten().tolist() # flattened board state
+    observations += [card] # drawn card
+    observations += [int(player == crib_owner)] # if we own the crib
+    observations += [cards_in_crib] # num of card we already put in the crib
+    obs = observations
 
-    # Create the Estimator
-    cribbage_classifier = tf.estimator.Estimator(model_fn=tb.cnn_model_fn, model_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), "xc_fullyconnected_model"))
+    #print(board_state)
+    #print(observations)
 
-    # Evaluate the model and print results
-    pred_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": temp_board_state},
-      num_epochs=1,
-      shuffle=False)
+    # convert to numpy array of floats
+    observations = np.asarray(observations).reshape((1, len(observations)))
 
-    eval_results = cribbage_classifier.predict(input_fn=pred_input_fn)
-    position_probabilities = next(eval_results)['probabilities']
+    # predict the probabilities
+    probabilities = predict_model.predict(observations)
+    probabilities = np.squeeze(probabilities)
 
-    temp_board = np.asarray(board_state).flatten()
+    one_hot = np.random.multinomial(1, probabilities, size=1)
+    move = np.argmax(one_hot)
 
-    max_prob = 0.0
-    best_pos = 0
+    #print(move)
 
-    for i in range(0, len(position_probabilities)):
-        # if the best position is the crib
-        if ((position_probabilities[i] > max_prob) and (i==25)):
-            # and the crib has open spots
-            if (cards_in_crib < 2):
-                max_prob = position_probabilities[i]
-                best_pos = i
-            else:
-                continue
-        # if the best position doesn't already have a card there
-        elif (position_probabilities[i] > max_prob) and (temp_board[i] == 0):
-            max_prob = position_probabilities[i]
-            best_pos = i
-
-    move = ''
-    if (best_pos == 25):
-        move = 'CRIB'
+    # convert index to a board position 3='A4', 11='C2', 25='E1'
+    # NOTE: the board is rotated such that the perspective is always
+    # horizontal scores points, and vertical is the enemy
+    # This undoes that normalization
+    encoded_move = ''
+    if (move == 25):
+        encoded_move = 'CRIB'
     elif (player==1):
-        move = chr(int(best_pos%5)+65) + chr(int(best_pos/5)+49)
+        encoded_move = chr(int(move%5)+65) + chr(int(move/5)+49)
     else: # player 0
-        move = chr(int(best_pos/5)+65) + chr(int(best_pos%5)+49)
+        encoded_move = chr(int(move/5)+65) + chr(int(move%5)+49)
 
-    print(move)
+    #print(encoded_move)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def a():
-    pass
+    return obs, move, encoded_move
