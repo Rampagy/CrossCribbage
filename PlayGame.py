@@ -14,7 +14,7 @@ save_loc = './model'
 # model checkpoint filename
 chkpnt_name = 'model.ckpt'
 # number of games to play
-n_game = 10000000
+n_game = 1000000
 # intervals between saves
 checkpoint_interval = 1000
 # if testing
@@ -32,8 +32,8 @@ def create_model():
     network = tflearn.fully_connected(network, 127, activation='relu')
     network = tflearn.dropout(network, 0.3) # 0.3 = keep prob
     network = tflearn.fully_connected(network, 26, activation='softmax')
-    network = tflearn.regression(network, optimizer='adam', learning_rate=0.000005,
-                         loss='binary_crossentropy', name='target', metric=None)
+    network = tflearn.regression(network, optimizer='adam', learning_rate=0.00005,
+                         loss='categorical_crossentropy', name='target', metric=None)
 
     model = tflearn.DNN(network, tensorboard_verbose=0, tensorboard_dir=save_loc)
 
@@ -52,26 +52,28 @@ def create_model():
 def conv_trainable_data(win_log, lose_log):
     # convert to numpy array to matrix operations
     win_log = np.asarray(win_log)
-    lose_log = np.asarray(lose_log)
+    #lose_log = np.asarray(lose_log)
 
     # encourage the winning moves
     win_move = win_log[:, 1]
     win_label = tflearn.data_utils.to_categorical(win_move, 26)
 
     # discourage the losing moves
-    lose_move = lose_log[:, 1]
-    lose_label = np.logical_not(tflearn.data_utils.to_categorical(lose_move, 26))
-    lose_label = lose_label*1.0
+    #lose_move = lose_log[:, 1]
+    #lose_label = np.logical_not(tflearn.data_utils.to_categorical(lose_move, 26))
+    #lose_label = lose_label*1.0
 
     # combine into one matrix
-    labels = np.append(win_label, lose_label, axis=0)
+    #labels = np.append(win_label, lose_label, axis=0)
+    labels = win_label
 
     # gather observations/features
     win_feat = win_log[:, 0].tolist()
-    lose_feat = lose_log[:, 0].tolist()
+    #lose_feat = lose_log[:, 0].tolist()
 
     # combine into one matrix
-    features = np.append(win_feat, lose_feat, axis=0)
+    #features = np.append(win_feat, lose_feat, axis=0)
+    features = win_feat
 
     return features, labels
 

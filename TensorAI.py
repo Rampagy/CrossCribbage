@@ -21,6 +21,12 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner, predict_model
     probabilities = predict_model.predict(observations)
     probabilities = np.squeeze(probabilities)
 
+    # due to rounding errors sometimes the sum will be greater than 1
+    if sum(probabilities) > 1.0:
+        # subtract the error from the largest probability to prevent errors
+        idx = np.argmax(probabilities)
+        probabilities[idx] -= sum(probabilities) - 1
+
     one_hot = np.random.multinomial(1, probabilities, size=1)
     move = np.argmax(one_hot)
 
