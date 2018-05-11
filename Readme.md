@@ -1,10 +1,10 @@
 # Cross Cribbage ASCII game
 
-This game was created to provide a base for a machine learning bot to train off of.  It produces a .csv file which has a record of the moves made during the game.  The rules for the game can be [found here.](http://www.outsetmedia.com/sites/default/files/Instructions%20-%20CrossCribb.pdf)  This game will only consist of 2 player variation.
+This game was created to provide a base for a machine learning bot to train off of.  It produces a .csv file which has a record of the moves made during the game.  The rules for the game can be [found here.](http://www.outsetmedia.com/sites/default/files/Instructions%20-%20CrossCribb.pdf)  This game will only consist of the 2 player variation.
 
 ## Save format
 
-The format the games are saved is "turn_game_state,card_being_placed,does_winner_have_crib,turn_resulting_game_state" where both game states are saved as comma seperated arrays.  The game matrix is flattened in a left to right then top to bottom fashion to form the saved array.  See example below.
+The format the games are saved is `turn_game_state,card_being_placed,does_winner_have_crib,turn_resulting_game_state` where both game states are saved as comma separated arrays.  The game matrix is flattened in a left to right then top to bottom fashion to form the saved array.  See example below.
 
 This game state:
 
@@ -28,24 +28,4 @@ The cards are encoded into a decimal from their original hierarchy+value.  The m
 
 ## Artificial Intelligence
 
-The AI currently simply goes creates a point differential grid for each position the card can be placed and then simply places it at the highest differential point.
-
-## Two User Game
-
-In order to play with a User vs AI rather than AI vs AI, simply replace comment line 39 and uncomment line 40 and 41 in CrossCribbage.py as shown below.
-
-AI vs AI
-
-```python
-move = aib.AIBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1)
-#print(board.DecipherCard(card))
-#move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
-```
-
-AI vs User
-
-```python
-#move = aib.AIBot(board.GetBoardState().transpose(), card, board.GetCardsInCrib(1), 1)
-print(board.DecipherCard(card))
-move = ub.UserBot(board.GetBoardState(), card, board.GetCardsInCrib(1))
-```
+The AI uses a Neural Network as a policy network with each position on the board being a feature of the game.  It also inputs the card it drew, whether it owns the crib, and how many cards it has already put in the crib.  The neural net then outputs a probability that it should put the card in each position (or the crib).  This means that there are 28 inputs into the neural net and 26 outputs.

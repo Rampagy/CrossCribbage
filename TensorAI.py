@@ -11,9 +11,6 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner, predict_model
     observations += [cards_in_crib] # num of card we already put in the crib
     obs = observations
 
-    #print(board_state)
-    #print(observations)
-
     # convert to numpy array of floats
     observations = np.asarray(observations).reshape((1, len(observations)))
 
@@ -25,12 +22,10 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner, predict_model
     if sum(probabilities) > 1.0:
         # subtract the error from the largest probability to prevent errors
         idx = np.argmax(probabilities)
-        probabilities[idx] -= sum(probabilities) - 1
+        probabilities[idx] -= (sum(probabilities) - 0.99999)
 
     one_hot = np.random.multinomial(1, probabilities, size=1)
     move = np.argmax(one_hot)
-
-    #print(move)
 
     # convert index to a board position 3='A4', 11='C2', 25='E1'
     # NOTE: the board is rotated such that the perspective is always
@@ -43,7 +38,5 @@ def TensorAI(board_state, card, cards_in_crib, player, crib_owner, predict_model
         encoded_move = chr(int(move%5)+65) + chr(int(move/5)+49)
     else: # player 0
         encoded_move = chr(int(move/5)+65) + chr(int(move%5)+49)
-
-    #print(encoded_move)
 
     return obs, move, encoded_move
