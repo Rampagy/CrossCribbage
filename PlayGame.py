@@ -25,11 +25,11 @@ TEST = False
 # function to create tensorflow model
 def create_model():
     network = tflearn.input_data(shape=[None, 28], name='input')
-    network = tflearn.fully_connected(network, 127, activation='relu')
+    network = tflearn.fully_connected(network, 1024, activation='relu')
     network = tflearn.dropout(network, 0.3) # 0.3 = keep prob
-    network = tflearn.fully_connected(network, 127, activation='relu')
+    network = tflearn.fully_connected(network, 1024, activation='relu')
     network = tflearn.dropout(network, 0.3) # 0.3 = keep prob
-    network = tflearn.fully_connected(network, 127, activation='relu')
+    network = tflearn.fully_connected(network, 1024, activation='relu')
     network = tflearn.dropout(network, 0.3) # 0.3 = keep prob
     network = tflearn.fully_connected(network, 26, activation='softmax')
     network = tflearn.regression(network, optimizer='adam', learning_rate=0.00005,
